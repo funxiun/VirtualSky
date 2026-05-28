@@ -851,6 +851,7 @@ function VirtualSky(input){
 	};
 
 	this.hipparcos = {};          // Define our star catalogue
+	this.buildHipparcosIndex();
 	this.updateClock(new Date()); // Define the 'current' time
 	this.fullsky = false;         // Are we showing the entire sky?
 
@@ -1239,6 +1240,7 @@ VirtualSky.prototype.load = function(t,file,fn){
 		if(t=="stars"){
 			this.starsdeep = true;
 			this.stars = this.stars.concat(this.convertStarsToRadians(data.stars));
+			this.buildHipparcosIndex();
 			// Add the stars to the lookup
 			this.lookup.star = [];
 			for(i = 0; i < this.stars.length; i++) this.lookup.star.push({'ra':this.stars[i][2],'dec':this.stars[i][3],'label':this.stars[i][0],'mag':this.stars[i][1]});
@@ -2801,6 +2803,11 @@ VirtualSky.prototype.drawLabel = function(x,y,d,colour,label){
 	c.fillText(label,x+xoff,y-(d+2));
 	return this;
 };
+VirtualSky.prototype.buildHipparcosIndex = function(){
+	this.hipparcos = {};
+	for(var s = 0; s < this.stars.length; s++) this.hipparcos[''+this.stars[s][0]] = s;
+	return this;
+};
 VirtualSky.prototype.drawConstellationLines = function(colour){
 	if(!(this.constellation.lines || this.constellation.labels)) return this;
 	if(!colour) colour = this.col.constellation;
@@ -2812,34 +2819,16 @@ VirtualSky.prototype.drawConstellationLines = function(colour){
 	var fontsize = this.fontsize();
 	this.setFont();
 	if(typeof this.lines!=="object") return this;
-	var pos,posa,posb,a,b,l,idx1,idx2,s;
+	var pos,posa,posb,a,b,l,idx1,idx2;
 	var maxl = this.maxLine();
 	for(var c = 0; c < this.lines.length; c++){
 		if(this.constellation.lines){
 			for(l = 3; l < this.lines[c].length; l+=2){
-				a = -1;
-				b = -1;
-				idx1 = ''+this.lines[c][l]+'';
-				idx2 = ''+this.lines[c][l+1]+'';
-				if(!this.hipparcos[idx1]){
-					for(s = 0; s < this.stars.length; s++){
-						if(this.stars[s][0] == this.lines[c][l]){
-							this.hipparcos[idx1] = s;
-							break;
-						}
-					}
-				}
-				if(!this.hipparcos[idx2]){
-					for(s = 0; s < this.stars.length; s++){
-						if(this.stars[s][0] == this.lines[c][l+1]){
-							this.hipparcos[idx2] = s;
-							break;
-						}
-					}
-				}
+				idx1 = ''+this.lines[c][l];
+				idx2 = ''+this.lines[c][l+1];
 				a = this.hipparcos[idx1];
 				b = this.hipparcos[idx2];
-				if(a >= 0 && b >= 0 && a < this.stars.length && b < this.stars.length){
+				if(a !== undefined && b !== undefined){
 					posa = this.radec2xy(this.stars[a][2], this.stars[a][3]);
 					posb = this.radec2xy(this.stars[b][2], this.stars[b][3]);
 					if(this.isVisible(posa.el) && this.isVisible(posb.el)){
