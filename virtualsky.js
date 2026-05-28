@@ -852,6 +852,8 @@ function VirtualSky(input){
 
 	this.hipparcos = {};          // Define our star catalogue
 	this.buildHipparcosIndex();
+	this._xyCache = null;
+	this._projKey = '';
 	this.updateClock(new Date()); // Define the 'current' time
 	this.fullsky = false;         // Are we showing the entire sky?
 
@@ -2156,16 +2158,18 @@ VirtualSky.prototype.ecliptic2xy = function(l,b,LST){
 // Inputs: RA (rad), Dec (rad)
 // Returns [x, y (,elevation)]
 VirtualSky.prototype.radec2xy = function(ra,dec){
-	if(typeof this.projection.radec2xy==="function") return this.projection.radec2xy.call(this,ra,dec);
-	else{
+	var key = ra+'|'+dec;
+	if(this._xyCache && key in this._xyCache) return this._xyCache[key];
+	var result;
+	if(typeof this.projection.radec2xy==="function"){
+		result = this.projection.radec2xy.call(this,ra,dec);
+	}else{
 		var coords = this.coord2horizon(ra, dec);
-		// Only return coordinates above the horizon
-		//if(coords[0] > 0){
-			var pos = this.azel2xy(coords[1]-(this.az_off*this.d2r),coords[0],this.wide,this.tall);
-			return {x:pos.x,y:pos.y,az:coords[1]*this.r2d,el:coords[0]*this.r2d};
-		//}
+		var pos = this.azel2xy(coords[1]-(this.az_off*this.d2r),coords[0],this.wide,this.tall);
+		result = {x:pos.x,y:pos.y,az:coords[1]*this.r2d,el:coords[0]*this.r2d};
 	}
-	return 0;
+	if(this._xyCache) this._xyCache[key] = result;
+	return result;
 };
 
 // Returns {ra (rad), dec (rad)}
@@ -2291,6 +2295,11 @@ VirtualSky.prototype.drawImmediate = function(proj){
 	if(!(this.c && this.c.getContext)) return this;
 
 	if(proj !== undefined) this.selectProjection(proj);
+
+	this.az_off = (this.az_off+360)%360;
+	var viewKey = this.times.LST+'|'+this.latitude.rad+'|'+this.az_off+'|'+this.wide+'|'+this.tall+'|'+(this.projection.id||'')+'|'+this.fov;
+	if(this._projKey !== viewKey){ this._projKey = viewKey; this._xyCache = Object.create(null); }
+
 	var white = this.col.white;
 	var black = this.col.black;
 	var i,off,clockstring,metric_clock,positionstring,metric_pos;
@@ -2605,7 +2614,6 @@ VirtualSky.prototype.drawStars = function(){
 	var c = this.ctx;
 	c.beginPath();
 	c.fillStyle = this.col.stars;
-	this.az_off = (this.az_off+360)%360;
 	atmos = this.hasAtmos();
 	fovf = Math.sqrt(30/this.fov);
 	var f = 1;
