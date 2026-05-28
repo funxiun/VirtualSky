@@ -933,36 +933,24 @@ function VirtualSky(input){
 	this.loadLanguage(this.language,'',fromqs);
 
 	// Define some VirtualSky styles
-	var v,a,b,r,s,p,k,c,bs;
-	v = '.virtualsky';
-	a = '#f0f0f0';
-	b = '#fcfcfc';
-	k = 'background';
-	c = k+'-color';
-	p = 'padding';
 	this.padding = 4;
-	bs = 'box-shadow:0px 0px 20px rgba(255,255,255,0.5);';
-	function br(i){ return 'border-radius:'+i+';-moz-border-radius:'+i+';-webkit-border-radius:'+i+';';}
-	r = br('0em');
-	s = br('3px');
-	S('head').append('<style type="text/css">'+
-		v+'_help { '+p+':10px;'+c+':white;'+r+'} '+
-		v+'_help ul { list-style:none;margin:0px;'+p+':0px; } '+
-		v+'_infobox { '+c+':'+a+';color:black;'+p+':5px;'+r+bs+'} '+
-		v+'_infobox img {} '+
-		v+'_infocredit {color:white;float:left;font-size:0.8em;'+p+':5px;position:absolute;} '+
-		v+'form { position:absolute;z-index:20;display:block;overflow:hidden;'+c+':#ddd;'+p+':10px;'+bs+r+' } '+
-		v+'_dismiss { float:right;'+p+': 0 5px 0 5px;margin:0px;font-weight:bold;cursor:pointer;color:black;margin-right:-5px;margin-top:-5px; } '+
-		v+'form input,'+v+'form .divider { display:inline-block;font-size:1em;text-align:center;margin-right:2px; } '+v+'form .divider { margin-top: 5px; '+p+': 2px;} '+
-		v+'button { '+k+':#e9e9e9; width: 1.5em; line-height: 1.5em; color: '+a+'; cursor: pointer; display: block; padding: 0px; text-align: center; color: #000000; font-size: 1em; } '+
-		v+'_help_key:active{ '+k+':#e9e9e9; } '+
-		v+'_help_key:hover{ border-color: #b0b0b0; } '+
-		v+'_help_key { cursor:pointer;display:inline-block;text-align:center;'+
-			k+':'+a+';'+k+':-moz-linear-gradient(top,'+a+','+b+');'+
-			k+':-webkit-gradient(linear,center top,center bottom,from('+a+'),to('+b+'));'+
-			s+'-webkit-'+k+'-clip:'+p+'-box;-moz-'+k+'-clip:'+p+';'+k+'-clip:'+
-			p+'-box;color:#303030;border:1px solid #e0e0e0;border-bottom-width:2px;white-space:nowrap;font-family:monospace'+
-			';'+p+':1px 6px;font-size:1.1em;}</style>');
+	S('head').append('<style>'+
+		'.virtualsky_help{padding:14px;background:rgba(8,12,28,0.93);border-radius:10px;color:#e2e8f4;border:1px solid rgba(255,255,255,0.12);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px)}'+
+		'.virtualsky_help ul{list-style:none;margin:0;padding:0}'+
+		'.virtualsky_infobox{background:rgba(8,12,28,0.92);color:#e2e8f4;padding:10px;border-radius:10px;box-shadow:0 4px 24px rgba(0,0,0,0.6);border:1px solid rgba(255,255,255,0.1)}'+
+		'.virtualsky_infocredit{color:rgba(255,255,255,0.45);float:left;font-size:.8em;padding:5px;position:absolute}'+
+		'.virtualskyform{position:absolute;z-index:20;display:block;overflow:hidden;background:rgba(8,12,28,0.93);padding:14px;border-radius:10px;box-shadow:0 8px 32px rgba(0,0,0,0.55);color:#e2e8f4;border:1px solid rgba(255,255,255,0.12);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px)}'+
+		'.virtualsky_dismiss{float:right;padding:0 6px;font-weight:bold;cursor:pointer;color:rgba(255,255,255,0.4);margin-right:-4px;margin-top:-4px}'+
+		'.virtualsky_dismiss:hover{color:#fff}'+
+		'.virtualskyform input,.virtualskyform .divider{display:inline-block;font-size:1em;text-align:center;margin-right:4px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.18);border-radius:6px;color:#e2e8f4;padding:4px 8px;outline:none}'+
+		'.virtualskyform input:focus{border-color:rgba(96,165,250,0.7);box-shadow:0 0 0 2px rgba(96,165,250,0.18)}'+
+		'.virtualskyform .divider{background:none;border:none;padding:5px 4px}'+
+		'.virtualskybutton{background:rgba(255,255,255,0.1);width:1.8em;line-height:1.8em;cursor:pointer;display:block;padding:0;text-align:center;color:#e2e8f4;font-size:1em;border-radius:7px;border:1px solid rgba(255,255,255,0.15);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}'+
+		'.virtualskybutton:hover{background:rgba(255,255,255,0.2)}'+
+		'.virtualsky_help_key:active{background:rgba(255,255,255,0.05)}'+
+		'.virtualsky_help_key:hover{border-color:rgba(255,255,255,0.45)}'+
+		'.virtualsky_help_key{cursor:pointer;display:inline-block;text-align:center;background:rgba(255,255,255,0.1);border-radius:5px;color:#e2e8f4;border:1px solid rgba(255,255,255,0.2);border-bottom-width:2px;white-space:nowrap;font-family:monospace;padding:2px 8px;font-size:1em}'+
+		'</style>');
 
 	this.pointers = []; // Define an empty list of pointers/markers
 
